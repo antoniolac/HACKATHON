@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="../static/css/recycle.css">
     <link rel="stylesheet" href="../static/css/commons.css">
     <title>EchoSphere</title>
 </head>
 <body>
     <div class="hero">
         <header class="logo">
-            <a><img class="image" src="../static/images/ecoSphere_logo.png" alt="Logo"></a>
+            <img class="image" src="../static/images/ecoSphere_logo.png" alt="Logo">
         </header>
         <nav class="information">
             <ul>
@@ -27,12 +27,15 @@
             </ul>
         </nav>
         <main class="main">
-            <form class="form">
+            <div class="recycle" id="recycle">
                 <img class="icons" src="../static/images/photographer.png" alt="Photographer Icon">
-                <input type="file" id="imageInput" accept="image/*">
-                <input type="button" id="bottone" value="Analizza" class="btn" onclick="start()">
-            </form>
-            <h3>Risultato:</h3>
+                <p class="anta-regular scritta">HOW DO I RECYCLE IT?</p>
+                <form class="form">
+                    <input type="file" id="imageInput" accept="image/*">
+                    <input type="button" id="bottone" value="Analizza" class="btn" onclick="start()">
+                </form>
+            </div>
+            <h3 class="anta-regular scritta">Risultato:</h3>
             <pre id="result"></pre>
             <img id="imagePreview" width="224" height="224" style="display:none;">
         </main>
