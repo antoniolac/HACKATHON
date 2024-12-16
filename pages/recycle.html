@@ -10,7 +10,7 @@
 <body>
     <div class="hero">
         <header class="logo">
-            <a><img class="image" src="../static/images/ecoSphere_logo.png"></a>
+            <a><img class="image" src="../static/images/ecoSphere_logo.png" alt="Logo"></a>
         </header>
         <nav class="information">
             <ul>
@@ -28,15 +28,17 @@
         </nav>
         <main class="main">
             <form class="form">
-                <img class="icons" src="../static/images/photographer.png" alt="">
+                <img class="icons" src="../static/images/photographer.png" alt="Photographer Icon">
                 <input type="file" id="imageInput" accept="image/*">
-                <input type="button" id="bottone" value="Analizza" onclick="uploadImage()">
+                <input type="button" id="bottone" value="Analizza" class="btn" onclick="start()">
             </form>
             <h3>Risultato:</h3>
             <pre id="result"></pre>
+            <img id="imagePreview" width="224" height="224" style="display:none;">
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="../static/js/script.js"></script>
 </body>
 </html>
+

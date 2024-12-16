@@ -1,50 +1,51 @@
-// script.js
-
-let model;
-
-// Carica il modello pre-addestrato YOLO da TensorFlow.js
-async function loadModel() {
-    model = await tf.loadGraphModel('https://storage.googleapis.com/tfjs-models/tfjs/coco-ssd/model.json');
-    console.log("Modello YOLO caricato");
+async function load() {
+    const mobilenet = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/classification/3/default/1', { fromTFHub: true });
+    return mobilenet;
 }
 
-// Funzione per l'analisi dell'immagine
-async function uploadImage() {
-    const input = document.getElementById('imageInput');
-    const file = input.files[0];
+async function getClassificationResult(tensor, labels) {
+    // Estrai i dati del tensor (array delle probabilità)
+    const scores = await tensor.data(); // O usa tensor.dataSync() per l'accesso sincrono
 
-    if (!file) {
-        alert('Seleziona un file immagine');
-        return;
-    }
+    // Trova l'indice del punteggio più alto
+    const topIndex = scores.indexOf(Math.max(...scores));
 
-    // Verifica che sia un'immagine
-    if (!file.type.startsWith('image/')) {
-        alert('Devi caricare un\'immagine!');
-        return;
-    }
+    // Ottieni l'etichetta per l'indice più alto
+    const topLabel = labels[topIndex];
 
-    const reader = new FileReader();
-    reader.onload = async function(event) {
-        const imageElement = new Image();
-        imageElement.src = event.target.result;
-        imageElement.onload = async function() {
-            const tensor = tf.browser.fromPixels(imageElement);
+    // Mostra il risultato della predizione
+    document.getElementById("result").textContent = `Predizione: ${topLabel} (Confidenza: ${scores[topIndex].toFixed(4)})`;
+}
 
-            // Preprocessa l'immagine per il modello (ridimensionamento e normalizzazione)
-            const resizedImage = tf.image.resizeBilinear(tensor, [416, 416]);
-            const normalizedImage = resizedImage.div(tf.scalar(255.0));
-            const inputTensor = normalizedImage.expandDims(0);
+async function start() {
+    const model = await load(); // Attendi che il modello sia caricato
+    console.log(model); // Mostra il modello nella console
 
-            // Esegui il rilevamento
-            const predictions = await model.executeAsync(inputTensor);
+    const response = await fetch('https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt');
+    const labels = (await response.text()).split('\n');
 
-            // Mostra i risultati
-            document.getElementById('result').textContent = JSON.stringify(predictions, null, 2);
+    const img = document.querySelector("#imagePreview");
+    const processedImg = tf.browser.fromPixels(img).resizeNearestNeighbor([224, 224]).toFloat().expandDims();
+
+    const predictions = await model.predict(processedImg);
+    await getClassificationResult(predictions, labels);
+}
+
+document.getElementById("imageInput").addEventListener("change", event => {
+    const file = event.target.files[0];
+    if (file) {
+        const imgElement = document.getElementById("imagePreview");
+        imgElement.style.display = 'block'; // Mostra l'immagine
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.onload = function() {
+                // Quando l'immagine è caricata, avvia l'analisi
+                start(); 
+            };
         };
-    };
-    reader.readAsDataURL(file);
-}
-
-// Carica il modello YOLO al caricamento della pagina
-window.onload = loadModel;
+        
+        reader.readAsDataURL(file); // Leggi il file come URL
+    }
+});
