@@ -1,5 +1,4 @@
 .hero{
-    height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -89,6 +88,13 @@ button {
 .icons{
     width: 150px;
     height: 150px;
+    padding: 0;
+    margin-left: 30px;
+}
+
+.graphic{
+    width: 400px;
+    height: auto;
     padding: 0;
     margin-left: 30px;
 }
