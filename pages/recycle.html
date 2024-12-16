@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="../static/css/commons.css">
+    <title>EchoSphere</title>
+</head>
+<body>
+    <div class="hero">
+        <header class="logo">
+            <a><img class="image" src="../static/images/ecoSphere_logo.png"></a>
+        </header>
+        <nav class="information">
+            <ul>
+                <li>
+                    <form action="/aboutUs" method="get">
+                        <button type="submit" class="mitr-regular">About us</button>
+                    </form>
+                </li>
+                <li>
+                    <form action="/contactUs" method="get">
+                        <button type="submit" class="mitr-regular">Contact us</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+        <main class="main">
+            <form class="form">
+                <img class="icons" src="../static/images/photographer.png" alt="">
+                <input type="file" id="imageInput" accept="image/*">
+                <input type="button" id="bottone" value="Analizza" onclick="uploadImage()">
+            </form>
+            <h3>Risultato:</h3>
+            <pre id="result"></pre>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="../static/js/script.js"></script>
+</body>
+</html>
