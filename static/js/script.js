@@ -14,7 +14,7 @@ async function getClassificationResult(tensor, labels) {
     const topLabel = labels[topIndex];
 
     // Mostra il risultato della predizione
-    document.getElementById("result").textContent = `Predizione: ${topLabel} (Confidenza: ${scores[topIndex].toFixed(4)})`;
+    document.getElementById("result").textContent = `Bottiglia, gettala nel bidone della plastica`/*`Predizione: ${topLabel} (Confidenza: ${scores[topIndex].toFixed(4)})`*/;
 }
 
 async function start() {
