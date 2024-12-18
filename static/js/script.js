@@ -1,51 +1,65 @@
-async function load() {
-    const mobilenet = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/classification/3/default/1', { fromTFHub: true });
-    return mobilenet;
-}
-
-async function getClassificationResult(tensor, labels) {
-    // Estrai i dati del tensor (array delle probabilità)
-    const scores = await tensor.data(); // O usa tensor.dataSync() per l'accesso sincrono
-
-    // Trova l'indice del punteggio più alto
-    const topIndex = scores.indexOf(Math.max(...scores));
-
-    // Ottieni l'etichetta per l'indice più alto
-    const topLabel = labels[topIndex];
-
-    // Mostra il risultato della predizione
-    document.getElementById("result").textContent = `Bottiglia, gettala nel bidone della plastica`/*`Predizione: ${topLabel} (Confidenza: ${scores[topIndex].toFixed(4)})`*/;
-}
-
 async function start() {
-    const model = await load(); // Attendi che il modello sia caricato
-    console.log(model); // Mostra il modello nella console
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const resultContainer = document.getElementById('result');
 
-    const response = await fetch('https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt');
-    const labels = (await response.text()).split('\n');
+    // Verifica che un file sia stato selezionato
+    if (imageInput.files && imageInput.files[0]) {
+        // Leggi il file selezionato
+        const fileReader = new FileReader();
+        fileReader.onload = async function (event) {
+            imagePreview.src = event.target.result;
+            imagePreview.style.display = 'block';
 
-    const img = document.querySelector("#imagePreview");
-    const processedImg = tf.browser.fromPixels(img).resizeNearestNeighbor([224, 224]).toFloat().expandDims();
+            // Carica il modello MobileNet
+            const model = await mobilenet.load();
 
-    const predictions = await model.predict(processedImg);
-    await getClassificationResult(predictions, labels);
-}
+            // Classifica l'immagine
+            model.classify(imagePreview).then(async predictions => {
+                console.log('Predictions:', predictions);
 
-document.getElementById("imageInput").addEventListener("change", event => {
-    const file = event.target.files[0];
-    if (file) {
-        const imgElement = document.getElementById("imagePreview");
-        imgElement.style.display = 'block'; // Mostra l'immagine
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            imgElement.src = e.target.result;
-            imgElement.onload = function() {
-                // Quando l'immagine è caricata, avvia l'analisi
-                start(); 
-            };
+                // Ordina le predizioni in base alla probabilità decrescente
+                const topPrediction = predictions.reduce((prev, current) => 
+                    (prev.probability > current.probability) ? prev : current
+                );
+
+                // Ottieni il nome della classe dalla predizione
+                const className = topPrediction.className;
+
+                // Carica e analizza il file CSV già presente
+                fetch('rifiuti.csv')
+                    .then(response => response.text())
+                    .then(csvData => {
+                        // Usa PapaParse per analizzare il CSV
+                        Papa.parse(csvData, {
+                            header: true,
+                            dynamicTyping: true,
+                            complete: function(results) {
+                                // Trova la voce corrispondente alla classe predetta
+                                const match = results.data.find(row => row.Name.toLowerCase() === className.toLowerCase());
+
+                                if (match) {
+                                    // Stampa il risultato nel tag <pre>
+                                    resultContainer.textContent = `Nome: ${match.Name}\nMateriale: ${match.Materiale}\nModalità di raccolta: ${match["Modalità Rifiuto"]}`;
+                                } else {
+                                    resultContainer.textContent = `Nessuna corrispondenza trovata per: ${className}`;
+                                }
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Errore nel caricamento del CSV:', error);
+                        resultContainer.textContent = 'Errore nel caricamento del file CSV.';
+                    });
+            }).catch(error => {
+                console.error('Errore nella classificazione:', error);
+                resultContainer.textContent = 'Errore durante l\'analisi dell\'immagine.';
+            });
         };
-        
-        reader.readAsDataURL(file); // Leggi il file come URL
+
+        // Leggi il file immagine come URL di dati
+        fileReader.readAsDataURL(imageInput.files[0]);
+    } else {
+        alert('Seleziona un\'immagine per analizzarla.');
     }
-});
+}
