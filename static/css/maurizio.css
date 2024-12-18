@@ -65,40 +65,33 @@ button {
     margin-left: 30px;
 }
 
-.titoletto{
-    font-size: 25px;
-    margin-bottom: 30px;
-    color: #228b22;
+.main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rectangle{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background-color: #e6e6fa;
     border-radius: 20px;
     border: solid 2px;
     padding: 15px;
     border-color: #000;
+    width: 1000px;
 }
 
-.li:hover
-{
-    transform: scale(1.2);
-    z-index: 2;
-    .titoloarticolo{
-        font-weight: bold;
-        color: #000;
-    }
+.titoletto{
+    color: #228b22;
 }
 
-#titoletto:hover{
-    transform: scale(1.1);
-    background-color: #e6e6fa;
-    color: black(127, 40, 204);
-}
-
-ul li{
-    color: black;
-    font-size: 20px;
-}
-
-.main{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.image2{
+    width: 600px;
+    height: 400px;
+    padding: 0;
+    margin-top: 10px;
+    border: solid 1px;
+    border-radius: 20px;
 }
