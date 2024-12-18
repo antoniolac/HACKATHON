@@ -1,0 +1,40 @@
+
+async function start() {
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const resultContainer = document.getElementById('result');
+
+    // Verifica che un file sia stato selezionato
+    if (imageInput.files && imageInput.files[0]) {
+        // Leggi il file selezionato
+        const fileReader = new FileReader();
+        fileReader.onload = async function (event) {
+            imagePreview.src = event.target.result;
+            imagePreview.style.display = 'block';
+
+            // Carica il modello MobileNet
+            const model = await mobilenet.load();
+
+            // Classifica l'immagine
+            model.classify(imagePreview).then(predictions => {
+                console.log('Predictions:', predictions);
+
+                // Ordina le predizioni in base alla probabilità decrescente
+                const topPrediction = predictions.reduce((prev, current) => 
+                    (prev.probability > current.probability) ? prev : current
+                );
+
+                // Mostra solo la predizione con la probabilità più alta
+                resultContainer.textContent = `${topPrediction.className} - ${(topPrediction.probability * 100).toFixed(2)}%`;
+            }).catch(error => {
+                console.error('Errore nella classificazione:', error);
+                resultContainer.textContent = 'Errore durante l\'analisi dell\'immagine.';
+            });
+        };
+
+        // Leggi il file come URL di dati
+        fileReader.readAsDataURL(imageInput.files[0]);
+    } else {
+        alert('Seleziona un\'immagine per analizzarla.');
+    }
+}
